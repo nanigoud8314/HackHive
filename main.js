@@ -1,4 +1,4 @@
-import './style.css'
+
 import { NavigationManager } from './js/navigation.js'
 import { UserManager } from './js/userManager.js'
 import { DashboardModule } from './js/modules/dashboard.js'
@@ -7,6 +7,8 @@ import { DrillsModule } from './js/modules/drills.js'
 import { EmergencyModule } from './js/modules/emergency.js'
 import { AdminModule } from './js/modules/admin.js'
 import { GameificationManager } from './js/gamification.js'
+
+
 
 class SafeLearnApp {
   constructor() {
