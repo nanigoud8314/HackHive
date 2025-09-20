@@ -89,11 +89,32 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+.login-btn {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+    margin-left: 10px;
+}
+
+.login-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.login-btn:active {
+    background: rgba(255, 255, 255, 0.3);
+}
 
 .app-container {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  gap:20px;
 }
 
 /* Header Styles */
@@ -552,6 +573,9 @@ body {
   .main-nav {
     flex-wrap: wrap;
     justify-content: center;
+    display:flex;
+    gap:30px;
+    flex-direction:row;
   }
   
   .nav-btn {
@@ -593,4 +617,5 @@ body {
     margin: var(--space-4);
     width: calc(100vw - 2rem);
   }
+  /* Add this new CSS to your style.css file */
 }
