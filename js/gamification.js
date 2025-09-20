@@ -75,11 +75,7 @@ export class GameificationManager {
   loadLeaderboard() {
     // Simulated leaderboard data
     return [
-      { name: 'Priya Sharma', points: 1250, badges: 8, region: 'North India', school: 'Delhi Public School' },
-      { name: 'Rahul Verma', points: 1180, badges: 7, region: 'West India', school: 'St. Xavier\'s High School' },
-      { name: 'Anita Patel', points: 1050, badges: 6, region: 'West India', school: 'Bright Future Academy' },
-      { name: 'Vikram Singh', points: 980, badges: 6, region: 'North India', school: 'Modern School' },
-      { name: 'Sneha Reddy', points: 925, badges: 5, region: 'South India', school: 'Narayana High School' }
+     
     ];
   }
 
