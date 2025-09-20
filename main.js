@@ -1,3 +1,4 @@
+// import './style.css'
 import { NavigationManager } from './js/navigation.js'
 import { UserManager } from './js/userManager.js'
 import { DashboardModule } from './js/modules/dashboard.js'
@@ -14,7 +15,7 @@ class SafeLearnApp {
     this.userManager = new UserManager();
     this.gamification = new GameificationManager();
     this.modules = {};
-
+    
     this.init();
   }
 
@@ -23,17 +24,16 @@ class SafeLearnApp {
     this.setupEventListeners();
     this.loadInitialView();
   }
+
   setupApp() {
     const app = document.querySelector('#app');
     app.innerHTML = `
       <div class="app-container">
         <header class="app-header">
-         <div class="header-content">
+          <div class="header-content">
             <div class="logo">
-              <div class="logo-icon">
-                <img src="logon.svg" alt="Logo">
-              </div>
-              <h1>Hackhive</h1>
+              <div class="logo-icon">🛡️</div>
+              <h1>SafeLearn</h1>
             </div>
             <nav class="main-nav" id="mainNav">
               <button class="nav-btn active" data-module="dashboard">
@@ -56,17 +56,17 @@ class SafeLearnApp {
                 <span class="nav-icon">⚙️</span>
                 Admin
               </button>
-              <button class="login-btn" id="loginBtn">Log In</button>
             </nav>
             <div class="user-info">
               <div class="user-profile" id="userProfile">
                 <div class="user-avatar">👤</div>
                 <div class="user-details">
-                  <span class="user-name" id="userName">Student</span>
+                  <span class="user-name" id="userName">User Role</span>
                   <span class="user-role" id="userRole">Loading...</span>
                 </div>
                 <div class="user-points" id="userPoints">0 pts</div>
               </div>
+              <button class="settings-btn" id="settingsBtn">⚙️</button>
             </div>
           </div>
         </header>
@@ -104,7 +104,9 @@ class SafeLearnApp {
                 <select id="userTypeSelect">
                   <option value="student">Student</option>
                   <option value="teacher">Teacher</option>
+                  <option value="Parent or Guardian">Parent or Guardian</option>
                   <option value="admin">Administrator</option>
+                  <option value="University or College">University or College</option>
                 </select>
               </div>
               <div class="setting-group">
@@ -153,13 +155,6 @@ class SafeLearnApp {
         this.switchModule(e.target.dataset.module);
       }
     });
-    const loginBtn = document.getElementById("loginBtn");
-    if (loginBtn) {
-      loginBtn.addEventListener("click", () => {
-        window.location.href = "login2.html";
-      });
-    }
-
 
     // Settings
     document.getElementById('settingsBtn').addEventListener('click', () => {
@@ -205,7 +200,7 @@ class SafeLearnApp {
     } else {
       adminBtn.style.display = 'none';
     }
-
+    
     document.getElementById('userRole').textContent = userType.charAt(0).toUpperCase() + userType.slice(1);
   }
 
@@ -224,38 +219,38 @@ class SafeLearnApp {
 
     this.handleUserTypeChange(userType);
     document.getElementById('settingsModal').classList.add('hidden');
-
+    
     // Refresh current module to reflect new settings
     const activeModule = document.querySelector('.nav-btn.active').dataset.module;
     this.switchModule(activeModule);
   }
 
-loadInitialView() {
-  // Load user settings
-  const savedUser = localStorage.getItem('safelearn_user');
-  if (savedUser) {
-    const userData = JSON.parse(savedUser);
-    document.getElementById('userTypeSelect').value = userData.type;
-    document.getElementById('regionSelect').value = userData.region;
-    document.getElementById('classSelect').value = userData.class;
-    document.getElementById('userPoints').textContent = `${userData.points} pts`;
-    this.handleUserTypeChange(userData.type);
+  loadInitialView() {
+    // Load user settings
+    const savedUser = localStorage.getItem('safelearn_user');
+    if (savedUser) {
+      const userData = JSON.parse(savedUser);
+      document.getElementById('userTypeSelect').value = userData.type;
+      document.getElementById('regionSelect').value = userData.region;
+      document.getElementById('classSelect').value = userData.class;
+      document.getElementById('userPoints').textContent = `${userData.points} pts`;
+      this.handleUserTypeChange(userData.type);
+    }
+
+    // Load dashboard
+    this.switchModule('dashboard');
+
+    // Simulate emergency alert (for demo)
+    setTimeout(() => {
+      this.showEmergencyAlert();
+    }, 3000);
   }
 
-  // Load dashboard
-  this.switchModule('dashboard');
-
-  // Simulate emergency alert (for demo)
-  setTimeout(() => {
-    this.showEmergencyAlert();
-  }, 3000);
-}
-
-showEmergencyAlert() {
-  const overlay = document.getElementById('emergencyOverlay');
-  const content = document.getElementById('emergencyContent');
-
-  content.innerHTML = `
+  showEmergencyAlert() {
+    const overlay = document.getElementById('emergencyOverlay');
+    const content = document.getElementById('emergencyContent');
+    
+    content.innerHTML = `
       <div class="alert-message">
         <p><strong>Weather Alert:</strong> Heavy rainfall expected in your region (Mumbai, Maharashtra) over the next 48 hours.</p>
         <p><strong>Preparedness Level:</strong> Medium Risk</p>
@@ -265,16 +260,16 @@ showEmergencyAlert() {
         </div>
       </div>
     `;
-
-  overlay.classList.remove('hidden');
-
-  // Auto-dismiss after 10 seconds
-  setTimeout(() => {
-    if (!overlay.classList.contains('hidden')) {
-      overlay.classList.add('hidden');
-    }
-  }, 10000);
-}
+    
+    overlay.classList.remove('hidden');
+    
+    // Auto-dismiss after 10 seconds
+    setTimeout(() => {
+      if (!overlay.classList.contains('hidden')) {
+        overlay.classList.add('hidden');
+      }
+    }, 10000);
+  }
 }
 
 // Initialize app when DOM is loaded
