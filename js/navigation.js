@@ -1,4 +1,4 @@
-export class Navigation {
+export class NavigationManaager {
   constructor(appContainer) {
     this.app = appContainer;
     this.modules = {};
