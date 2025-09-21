@@ -158,7 +158,7 @@ class SafeLearnApp {
     const loginBtn = document.getElementById("loginBtn");
     if (loginBtn) {
       loginBtn.addEventListener("click", () => {
-        window.location.href = "login2.html";
+        window.location.href = "login.html";
       });
     }
 
