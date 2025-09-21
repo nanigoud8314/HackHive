@@ -57,7 +57,8 @@ class SafeLearnApp {
                 <span class="nav-icon">⚙️</span>
                 Admin
               </button>
-              <button class="login-btn" id="loginBtn">Log In</button>
+              <button class="login-btn" id="loginBtn" style="display: none;">Log In</button>
+              <button class="login-btn" id="logoutBtn" style="display: none;">Log Out</button>
             </nav>
             <div class="user-info">
               <button class="settings-btn" id="settingsBtn">⚙️</button>
@@ -149,19 +150,30 @@ class SafeLearnApp {
   }
 
   setupEventListeners() {
+    // Check authentication on load
+    this.checkAuthentication();
+
     // Navigation
     document.addEventListener('click', (e) => {
       if (e.target.matches('[data-module]')) {
         this.switchModule(e.target.dataset.module);
       }
     });
+    
     const loginBtn = document.getElementById("loginBtn");
+    const logoutBtn = document.getElementById("logoutBtn");
+    
     if (loginBtn) {
       loginBtn.addEventListener("click", () => {
         window.location.href = "login.html";
       });
     }
 
+    if (logoutBtn) {
+      logoutBtn.addEventListener("click", () => {
+        this.logout();
+      });
+    }
 
     // Settings
     document.getElementById('settingsBtn').addEventListener('click', () => {
@@ -187,16 +199,76 @@ class SafeLearnApp {
     });
   }
 
+  checkAuthentication() {
+    const token = localStorage.getItem('hackhive_token');
+    const loginBtn = document.getElementById('loginBtn');
+    const logoutBtn = document.getElementById('logoutBtn');
+    const userProfile = document.getElementById('userProfile');
+    
+    if (token) {
+      // User is logged in
+      loginBtn.style.display = 'none';
+      logoutBtn.style.display = 'block';
+      userProfile.style.display = 'flex';
+      this.loadUserData();
+    } else {
+      // User is not logged in
+      loginBtn.style.display = 'block';
+      logoutBtn.style.display = 'none';
+      userProfile.style.display = 'none';
+      // Redirect to login if trying to access protected content
+      window.location.href = 'login.html';
+    }
+  }
+
+  loadUserData() {
+    const user = JSON.parse(localStorage.getItem('hackhive_user') || '{}');
+    if (user.id) {
+      document.getElementById('userName').textContent = `${user.firstName} ${user.lastName}`;
+      document.getElementById('userRole').textContent = user.role.charAt(0).toUpperCase() + user.role.slice(1);
+      document.getElementById('userPoints').textContent = `${user.points || 0} pts`;
+      
+      // Show admin panel for admins and teachers
+      if (user.role === 'admin' || user.role === 'teacher') {
+        document.querySelector('[data-module="admin"]').style.display = 'block';
+      }
+      
+      // Update user type select in settings
+      const userTypeSelect = document.getElementById('userTypeSelect');
+      const regionSelect = document.getElementById('regionSelect');
+      if (userTypeSelect) userTypeSelect.value = user.role;
+      if (regionSelect) regionSelect.value = user.region;
+    }
+  }
+
+  logout() {
+    localStorage.removeItem('hackhive_token');
+    localStorage.removeItem('hackhive_user');
+    localStorage.removeItem('safelearn_user');
+    window.location.href = 'login.html';
+  }
+
   switchModule(moduleName) {
+    // Check authentication before switching modules
+    if (!localStorage.getItem('hackhive_token')) {
+      window.location.href = 'login.html';
+      return;
+    }
+
     // Update navigation
     document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
-    document.querySelector(`[data-module="${moduleName}"]`).classList.add('active');
+    const moduleBtn = document.querySelector(`[data-module="${moduleName}"]`);
+    if (moduleBtn) {
+      moduleBtn.classList.add('active');
+    }
 
     // Load module content
     const contentContainer = document.getElementById('contentContainer');
     if (this.modules[moduleName]) {
       contentContainer.innerHTML = this.modules[moduleName].render();
       this.modules[moduleName].initialize();
+    } else {
+      contentContainer.innerHTML = '<div class="error-message">Module not found</div>';
     }
   }
 
@@ -233,21 +305,35 @@ class SafeLearnApp {
   }
 
 loadInitialView() {
-  // Load user settings
-  const savedUser = localStorage.getItem('safelearn_user');
+  // Check authentication first
+  if (!localStorage.getItem('hackhive_token')) {
+    window.location.href = 'login.html';
+    return;
+  }
+
+  // Load user settings from both storage formats
+  let savedUser = localStorage.getItem('hackhive_user');
+  if (!savedUser) {
+    savedUser = localStorage.getItem('safelearn_user');
+  }
+  
   if (savedUser) {
     const userData = JSON.parse(savedUser);
-    document.getElementById('userTypeSelect').value = userData.type;
-    document.getElementById('regionSelect').value = userData.region;
-    document.getElementById('classSelect').value = userData.class;
-    document.getElementById('userPoints').textContent = `${userData.points} pts`;
-    this.handleUserTypeChange(userData.type);
+    const userTypeSelect = document.getElementById('userTypeSelect');
+    const regionSelect = document.getElementById('regionSelect');
+    const classSelect = document.getElementById('classSelect');
+    
+    if (userTypeSelect) userTypeSelect.value = userData.type || userData.role;
+    if (regionSelect) regionSelect.value = userData.region;
+    if (classSelect) classSelect.value = userData.class || userData.profile?.grade || 'secondary';
+    
+    this.handleUserTypeChange(userData.type || userData.role);
   }
 
   // Load dashboard
   this.switchModule('dashboard');
 
-  // Simulate emergency alert (for demo)
+  // Simulate emergency alert (for demo) - only if user is authenticated
   setTimeout(() => {
     this.showEmergencyAlert();
   }, 3000);

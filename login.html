@@ -365,6 +365,18 @@
           </select>
         </div>
 
+        <div class="form-group" id="gradeGroup">
+          <label class="form-label" for="signupGrade">Grade/Class</label>
+          <select class="form-select" id="signupGrade">
+            <option value="">Select your grade</option>
+            <option value="primary">Primary (1-5)</option>
+            <option value="middle">Middle (6-8)</option>
+            <option value="secondary">Secondary (9-10)</option>
+            <option value="senior">Senior Secondary (11-12)</option>
+            <option value="college">College/University</option>
+          </select>
+        </div>
+
         <button type="submit" class="auth-button" id="signupButton">
           <span class="loading-spinner" id="signupSpinner"></span>
           <span id="signupButtonText">Create Account</span>
@@ -416,6 +428,7 @@
     document.getElementById('signupRole').addEventListener('change', (e) => {
       const desc = document.getElementById('signupRoleDesc');
       const institutionGroup = document.getElementById('institutionGroup');
+      const gradeGroup = document.getElementById('gradeGroup');
       
       desc.textContent = roleDescriptions[e.target.value] || '';
       
@@ -427,10 +440,19 @@
         institutionGroup.style.display = 'none';
         document.getElementById('signupInstitution').required = false;
       }
+
+      // Show grade field for students
+      if (e.target.value === 'student') {
+        gradeGroup.style.display = 'block';
+        document.getElementById('signupGrade').required = true;
+      } else {
+        gradeGroup.style.display = 'none';
+        document.getElementById('signupGrade').required = false;
+      }
     });
 
-    // API Base URL
-    const API_BASE = 'http://localhost:3000/api';
+    // API Base URL - Updated to use localhost for development
+    const API_BASE = window.location.hostname === 'localhost' ? 'http://localhost:3000/api' : '/api';
 
     // Utility functions
     function showError(formType, message) {
@@ -492,6 +514,21 @@
         if (response.ok) {
           localStorage.setItem('hackhive_token', data.token);
           localStorage.setItem('hackhive_user', JSON.stringify(data.user));
+          
+          // Also set the old format for compatibility
+          localStorage.setItem('safelearn_user', JSON.stringify({
+            id: data.user.id,
+            name: `${data.user.firstName} ${data.user.lastName}`,
+            type: data.user.role,
+            region: data.user.region,
+            class: data.user.profile?.grade || 'secondary',
+            points: data.user.points || 0,
+            badges: data.user.badges || [],
+            completedModules: data.user.completedModules || [],
+            drillsCompleted: data.user.drillsCompleted || 0,
+            bestDrillScore: data.user.bestDrillScore || 0
+          }));
+          
           showSuccess('login', 'Login successful! Redirecting...');
           
           setTimeout(() => {
@@ -535,7 +572,10 @@
         password: password,
         role: document.getElementById('signupRole').value,
         region: document.getElementById('signupRegion').value,
-        institution: document.getElementById('signupInstitution').value || null
+        institution: document.getElementById('signupInstitution').value || null,
+        profile: {
+          grade: document.getElementById('signupGrade').value || null
+        }
       };
 
       try {

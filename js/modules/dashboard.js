@@ -415,6 +415,13 @@ export class DashboardModule {
   }
 
   initialize() {
+    // Check if user is logged in
+    const token = localStorage.getItem('hackhive_token');
+    if (!token) {
+      window.location.href = 'login.html';
+      return;
+    }
+
     this.loadProgressData();
     this.loadAlerts();
     this.loadAchievements();
@@ -424,7 +431,12 @@ export class DashboardModule {
   }
 
   loadProgressData() {
-    const user = JSON.parse(localStorage.getItem('safelearn_user') || '{}');
+    // Try to get user data from both new and old storage formats
+    let user = JSON.parse(localStorage.getItem('hackhive_user') || '{}');
+    if (!user.id) {
+      user = JSON.parse(localStorage.getItem('safelearn_user') || '{}');
+    }
+    
     const gamification = window.gamification || { generateProgressData: () => ({ currentLevel: { level: 0, title: 'New Learner' }, progress: 0, pointsToNext: 100, totalPoints: 0 }) };
     
     const progressData = gamification.generateProgressData(user.points || 0);
@@ -505,7 +517,10 @@ export class DashboardModule {
 
   loadAlerts() {
     const alertList = document.getElementById('alertList');
-    const user = JSON.parse(localStorage.getItem('safelearn_user') || '{}');
+    let user = JSON.parse(localStorage.getItem('hackhive_user') || '{}');
+    if (!user.id) {
+      user = JSON.parse(localStorage.getItem('safelearn_user') || '{}');
+    }
     const region = user.region || 'west';
     
     const mockAlerts = {
@@ -553,7 +568,10 @@ export class DashboardModule {
 
   loadAchievements() {
     const achievementsContent = document.getElementById('achievementsContent');
-    const user = JSON.parse(localStorage.getItem('safelearn_user') || '{}');
+    let user = JSON.parse(localStorage.getItem('hackhive_user') || '{}');
+    if (!user.id) {
+      user = JSON.parse(localStorage.getItem('safelearn_user') || '{}');
+    }
     const userBadges = user.badges || [];
     
     const recentAchievements = [
@@ -578,7 +596,10 @@ export class DashboardModule {
 
   loadRegionalInfo() {
     const regionalInfo = document.getElementById('regionalInfo');
-    const user = JSON.parse(localStorage.getItem('safelearn_user') || '{}');
+    let user = JSON.parse(localStorage.getItem('hackhive_user') || '{}');
+    if (!user.id) {
+      user = JSON.parse(localStorage.getItem('safelearn_user') || '{}');
+    }
     const region = user.region || 'west';
     
     const regionData = {
