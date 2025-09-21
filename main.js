@@ -60,6 +60,7 @@ class SafeLearnApp {
               <button class="login-btn" id="loginBtn">Log In</button>
             </nav>
             <div class="user-info">
+              <button class="settings-btn" id="settingsBtn">⚙️</button>
               <div class="user-profile" id="userProfile">
                 <div class="user-avatar">👤</div>
                 <div class="user-details">
