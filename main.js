@@ -1,12 +1,15 @@
-// import './style.css'
-import { NavigationManager } from './js/navigation.js'
-import { UserManager } from './js/userManager.js'
-import { DashboardModule } from './js/modules/dashboard.js'
-import { LearningModule } from './js/modules/learning.js'
-import { DrillsModule } from './js/modules/drills.js'
-import { EmergencyModule } from './js/modules/emergency.js'
-import { AdminModule } from './js/modules/admin.js'
-import { GameificationManager } from './js/gamification.js'
+
+import { HomeModule } from './js/home.js';
+import { NavigationManager } from './js/navigation.js';
+import { UserManager } from './js/userManager.js';
+import { DashboardModule } from './js/modules/dashboard.js';
+import { LearningModule } from './js/modules/learning.js';
+import { DrillsModule } from './js/modules/drills.js';
+import { SimulationModule } from './js/modules/simulation.js';
+import { ProgressModule } from './js/modules/progress.js';
+import { EmergencyModule } from './js/modules/emergency.js';
+import { AdminModule } from './js/modules/admin.js';
+import { GameificationManager } from './js/gamification.js';
 
 class SafeLearnApp {
   constructor() {
@@ -24,6 +27,7 @@ class SafeLearnApp {
     this.setupEventListeners();
     this.loadInitialView();
   }
+
   setupApp() {
     const app = document.querySelector('#app');
     app.innerHTML = `
@@ -32,42 +36,49 @@ class SafeLearnApp {
          <div class="header-content">
             <div class="logo">
               <div class="logo-icon">
-                <img src="logon.svg" alt="Logo">
+                <img src="logo.png" alt="Logo">
               </div>
               <h1>Hackhive</h1>
             </div>
             <nav class="main-nav" id="mainNav">
-              <button class="nav-btn" data-module="dashboard">
+              <button class="nav-btn requires-auth" data-module="dashboard" data-role="student">
                 <span class="nav-icon">🏠</span>
                 Dashboard
               </button>
-              <button class="nav-btn" data-module="learning">
+              <button class="nav-btn requires-auth" data-module="learning" data-role="student">
                 <span class="nav-icon">📚</span>
                 Learn
               </button>
-              <button class="nav-btn" data-module="drills">
+              <button class="nav-btn requires-auth" data-module="drills" data-role="student">
                 <span class="nav-icon">🎯</span>
                 Virtual Drills
               </button>
-              <button class="nav-btn" data-module="emergency">
+               <button class="nav-btn requires-auth" data-module="simulation" data-role="student">
+                <span class="nav-icon">🎥</span>
+                Simulation Videos
+              </button>
+              <button class="nav-btn requires-auth" data-module="progress" data-role="teacher">
+                <span class="nav-icon">📈</span>
+                Student Progress
+              </button>
+              <button class="nav-btn requires-auth" data-module="emergency">
                 <span class="nav-icon">🚨</span>
                 Emergency
               </button>
-              <button class="nav-btn admin-only" data-module="admin" style="display: none;">
+              <button class="nav-btn requires-auth" data-module="admin" data-role="admin">
                 <span class="nav-icon">⚙️</span>
                 Admin
               </button>
-              <button class="login-btn" id="loginBtn">Log In</button>
+              <button class="login-btn no-auth" id="loginBtn">Log In</button>
+              <button class="logout-btn requires-auth" id="logoutBtn">Log Out</button>
             </nav>
-            <div class="user-info">
-              <button class="settings-btn" id="settingsBtn">⚙️</button>
+            <div class="user-info requires-auth">
               <div class="user-profile" id="userProfile">
                 <div class="user-avatar">👤</div>
                 <div class="user-details">
-                  <span class="user-name" id="userName">Student</span>
-                  <span class="user-role" id="userRole">Loading...</span>
+                  <span class="user-name" id="userName"></span>
+                  <span class="user-role" id="userRole"></span>
                 </div>
-                <div class="user-points" id="userPoints">0 pts</div>
               </div>
             </div>
           </div>
@@ -79,61 +90,7 @@ class SafeLearnApp {
           </div>
         </main>
 
-        <!-- Emergency Alert Overlay -->
-        <div class="emergency-overlay hidden" id="emergencyOverlay">
-          <div class="emergency-alert">
-            <div class="emergency-header">
-              <span class="emergency-icon">🚨</span>
-              <h2>Emergency Alert</h2>
-              <button class="close-alert" id="closeAlert">×</button>
-            </div>
-            <div class="emergency-content" id="emergencyContent">
-              <!-- Alert content -->
-            </div>
-          </div>
-        </div>
-
-        <!-- Settings Modal -->
-        <div class="modal-overlay hidden" id="settingsModal">
-          <div class="modal">
-            <div class="modal-header">
-              <h3>Settings</h3>
-              <button class="close-modal" id="closeSettings">×</button>
-            </div>
-            <div class="modal-content">
-              <div class="setting-group">
-                <label for="userTypeSelect">User Type:</label>
-                <select id="userTypeSelect">
-                  <option value="student">Student</option>
-                  <option value="teacher">Teacher</option>
-                  <option value="admin">Administrator</option>
-                </select>
-              </div>
-              <div class="setting-group">
-                <label for="regionSelect">Region:</label>
-                <select id="regionSelect">
-                  <option value="north">North India</option>
-                  <option value="south">South India</option>
-                  <option value="east">East India</option>
-                  <option value="west">West India</option>
-                  <option value="central">Central India</option>
-                  <option value="northeast">Northeast India</option>
-                </select>
-              </div>
-              <div class="setting-group">
-                <label for="classSelect">Class/Grade:</label>
-                <select id="classSelect">
-                  <option value="primary">Primary (1-5)</option>
-                  <option value="middle">Middle (6-8)</option>
-                  <option value="secondary">Secondary (9-10)</option>
-                  <option value="senior">Senior Secondary (11-12)</option>
-                  <option value="college">College/University</option>
-                </select>
-              </div>
-              <button class="save-settings" id="saveSettings">Save Settings</button>
-            </div>
-          </div>
-        </div>
+        <div id="authModalContainer"></div>
       </div>
     `;
 
@@ -141,145 +98,176 @@ class SafeLearnApp {
   }
 
   initializeModules() {
+    this.modules.home = new HomeModule();
     this.modules.dashboard = new DashboardModule();
     this.modules.learning = new LearningModule();
     this.modules.drills = new DrillsModule();
+    this.modules.simulation = new SimulationModule();
+    this.modules.progress = new ProgressModule();
     this.modules.emergency = new EmergencyModule();
     this.modules.admin = new AdminModule();
   }
 
   setupEventListeners() {
-    // Navigation
     document.addEventListener('click', (e) => {
       if (e.target.matches('[data-module]')) {
         this.switchModule(e.target.dataset.module);
       }
     });
-    const loginBtn = document.getElementById("loginBtn");
-    if (loginBtn) {
-      loginBtn.addEventListener("click", () => {
-        window.location.href = "login.html";
-      });
-    }
 
-
-    // Settings
-    document.getElementById('settingsBtn').addEventListener('click', () => {
-      document.getElementById('settingsModal').classList.remove('hidden');
-    });
-
-    document.getElementById('closeSettings').addEventListener('click', () => {
-      document.getElementById('settingsModal').classList.add('hidden');
-    });
-
-    document.getElementById('saveSettings').addEventListener('click', () => {
-      this.saveUserSettings();
-    });
-
-    // Emergency alert
-    document.getElementById('closeAlert').addEventListener('click', () => {
-      document.getElementById('emergencyOverlay').classList.add('hidden');
-    });
-
-    // User type change
-    document.getElementById('userTypeSelect').addEventListener('change', (e) => {
-      this.handleUserTypeChange(e.target.value);
-    });
+    document.getElementById('loginBtn').addEventListener('click', () => this.showAuthModal());
+    document.getElementById('logoutBtn').addEventListener('click', () => this.logout());
   }
 
-  switchModule(moduleName) {
-    // Update navigation
-    document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
-    document.querySelector(`[data-module="${moduleName}"]`).classList.add('active');
+  loadInitialView() {
+    const token = localStorage.getItem('hackhive_token');
+    if (token) {
+      const userData = JSON.parse(localStorage.getItem('hackhive_user'));
+      this.currentUser = userData;
+      this.setLoggedInState(userData.role);
+      this.updateUserInfo(userData);
+      this.switchModule(userData.role === 'student' ? 'dashboard' : 'progress');
+    } else {
+      this.setLoggedOutState();
+      this.switchModule('home');
+    }
+  }
 
-    // Load module content
-    const contentContainer = document.getElementById('contentContainer');
-    if (this.modules[moduleName]) {
-      contentContainer.innerHTML = this.modules[moduleName].render();
-      this.modules[moduleName].initialize();
+  setLoggedInState(role) {
+    document.body.classList.add('logged-in');
+    document.querySelectorAll('.requires-auth').forEach(el => el.style.display = 'flex');
+    document.querySelectorAll('.no-auth').forEach(el => el.style.display = 'none');
+    this.handleUserTypeChange(role);
+  }
+
+  setLoggedOutState() {
+    document.body.classList.remove('logged-in');
+    document.querySelectorAll('.requires-auth').forEach(el => el.style.display = 'none');
+    document.querySelectorAll('.no-auth').forEach(el => el.style.display = 'flex');
+  }
+
+  updateUserInfo(userData) {
+    if (userData) {
+      document.getElementById('userName').textContent = `${userData.firstName}`;
+      document.getElementById('userRole').textContent = userData.role.charAt(0).toUpperCase() + userData.role.slice(1);
     }
   }
 
   handleUserTypeChange(userType) {
-    const adminBtn = document.querySelector('[data-module="admin"]');
-    if (userType === 'admin' || userType === 'teacher') {
-      adminBtn.style.display = 'block';
+    document.querySelectorAll('[data-role]').forEach(el => {
+      if (el.dataset.role === userType) {
+        el.style.display = 'flex';
+      } else {
+        el.style.display = 'none';
+      }
+    });
+  }
+  
+  logout() {
+    localStorage.removeItem('hackhive_token');
+    localStorage.removeItem('hackhive_user');
+    this.currentUser = null;
+    this.setLoggedOutState();
+    this.switchModule('home');
+  }
+
+  switchModule(moduleName) {
+    const contentContainer = document.getElementById('contentContainer');
+    if (this.modules[moduleName]) {
+      contentContainer.innerHTML = this.modules[moduleName].render();
+      if (this.modules[moduleName].initialize) {
+        this.modules[moduleName].initialize();
+      }
+      
+      document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+      const activeBtn = document.querySelector(`[data-module="${moduleName}"]`);
+      if (activeBtn) {
+        activeBtn.classList.add('active');
+      }
     } else {
-      adminBtn.style.display = 'none';
+      contentContainer.innerHTML = `<p>Module ${moduleName} not found.</p>`;
     }
-
-    document.getElementById('userRole').textContent = userType.charAt(0).toUpperCase() + userType.slice(1);
   }
 
-  saveUserSettings() {
-    const userType = document.getElementById('userTypeSelect').value;
-    const region = document.getElementById('regionSelect').value;
-    const classLevel = document.getElementById('classSelect').value;
-
-    // Save to localStorage
-    localStorage.setItem('safelearn_user', JSON.stringify({
-      type: userType,
-      region: region,
-      class: classLevel,
-      points: parseInt(document.getElementById('userPoints').textContent) || 0
-    }));
-
-    this.handleUserTypeChange(userType);
-    document.getElementById('settingsModal').classList.add('hidden');
-
-    // Refresh current module to reflect new settings
-    const activeModule = document.querySelector('.nav-btn.active').dataset.module;
-    this.switchModule(activeModule);
+  showAuthModal() {
+    const authModalContainer = document.getElementById('authModalContainer');
+    authModalContainer.innerHTML = this.getAuthModalHTML();
+    this.setupAuthListeners();
+    document.getElementById('authModal').classList.remove('hidden');
   }
 
-loadInitialView() {
-  // Load user settings
-  const savedUser = localStorage.getItem('safelearn_user');
-  if (savedUser) {
-    const userData = JSON.parse(savedUser);
-    document.getElementById('userTypeSelect').value = userData.type;
-    document.getElementById('regionSelect').value = userData.region;
-    document.getElementById('classSelect').value = userData.class;
-    document.getElementById('userPoints').textContent = `${userData.points} pts`;
-    this.handleUserTypeChange(userData.type);
+  hideAuthModal() {
+    const authModal = document.getElementById('authModal');
+    if (authModal) {
+      authModal.classList.add('hidden');
+    }
   }
 
-  // Load dashboard
-  this.switchModule('dashboard');
+  setupAuthListeners() {
+    const loginForm = document.getElementById('loginForm');
+    const signupForm = document.getElementById('signupForm');
+    
+    document.getElementById('showSignup').addEventListener('click', (e) => {
+      e.preventDefault();
+      loginForm.style.display = 'none';
+      signupForm.style.display = 'block';
+    });
 
-  // Simulate emergency alert (for demo)
-  setTimeout(() => {
-    this.showEmergencyAlert();
-  }, 3000);
-}
+    document.getElementById('showLogin').addEventListener('click', (e) => {
+      e.preventDefault();
+      signupForm.style.display = 'none';
+      loginForm.style.display = 'block';
+    });
+    
+    loginForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const role = e.target.querySelector('#loginRole').value;
+        const user = { firstName: 'John', role };
+        localStorage.setItem('hackhive_token', 'mock_token');
+        localStorage.setItem('hackhive_user', JSON.stringify(user));
+        this.hideAuthModal();
+        this.loadInitialView();
+    });
 
-showEmergencyAlert() {
-  const overlay = document.getElementById('emergencyOverlay');
-  const content = document.getElementById('emergencyContent');
+    signupForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        document.getElementById('showLogin').click();
+    });
+  }
 
-  content.innerHTML = `
-      <div class="alert-message">
-        <p><strong>Weather Alert:</strong> Heavy rainfall expected in your region (Mumbai, Maharashtra) over the next 48 hours.</p>
-        <p><strong>Preparedness Level:</strong> Medium Risk</p>
-        <div class="alert-actions">
-          <button class="alert-btn primary">View Safety Guidelines</button>
-          <button class="alert-btn secondary">Dismiss</button>
+  getAuthModalHTML() {
+    return `
+      <div class="modal-overlay" id="authModal">
+        <div class="modal">
+           <button class="close-modal" id="closeAuthModal" onclick="document.getElementById('authModal').classList.add('hidden')">×</button>
+           <div id="loginForm">
+              <h3>Login</h3>
+              <form>
+                <input type="email" placeholder="Email" required><br>
+                <input type="password" placeholder="Password" required><br>
+                <select id="loginRole"><option value="student">Student</option><option value="teacher">Teacher</option></select><br>
+                <button type="submit">Login</button>
+              </form>
+              <p>Don't have an account? <a href="#" id="showSignup">Sign Up</a></p>
+           </div>
+           <div id="signupForm" style="display:none;">
+              <h3>Sign Up</h3>
+              <form>
+                <input type="text" placeholder="First Name" required><br>
+                <input type="email" placeholder="Email" required><br>
+                <input type="password" placeholder="Password" required><br>
+                <select><option value="student">Student</option><option value="teacher">Teacher</option></select><br>
+                <button type="submit">Sign Up</button>
+              </form>
+              <p>Already have an account? <a href="#" id="showLogin">Login</a></p>
+           </div>
         </div>
       </div>
     `;
+  }
 
-  overlay.classList.remove('hidden');
-
-  // Auto-dismiss after 10 seconds
-  setTimeout(() => {
-    if (!overlay.classList.contains('hidden')) {
-      overlay.classList.add('hidden');
-    }
-  }, 10000);
-}
 }
 
-// Initialize app when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
   new SafeLearnApp();
 });
