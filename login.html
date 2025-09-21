@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HackHive - Disaster Management Education Platform</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .auth-container {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+      width: 100%;
+      max-width: 450px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .auth-header {
+      background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+      color: white;
+      padding: 40px 30px 30px;
+      text-align: center;
+      position: relative;
+    }
+
+    .auth-header::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="0.5"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+      opacity: 0.3;
+    }
+
+    .logo {
+      position: relative;
+      z-index: 1;
+    }
+
+    .logo-icon {
+      width: 60px;
+      height: 60px;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 15px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 15px;
+      font-size: 28px;
+    }
+
+    .auth-title {
+      font-size: 28px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .auth-subtitle {
+      font-size: 16px;
+      opacity: 0.9;
+      font-weight: 400;
+      position: relative;
+      z-index: 1;
+    }
+
+    .auth-content {
+      padding: 40px 30px;
+    }
+
+    .form-group {
+      margin-bottom: 25px;
+    }
+
+    .form-label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 500;
+      color: #374151;
+      font-size: 14px;
+    }
+
+    .form-input, .form-select {
+      width: 100%;
+      padding: 15px 18px;
+      border: 2px solid #e5e7eb;
+      border-radius: 12px;
+      font-size: 16px;
+      transition: all 0.3s ease;
+      background: #f9fafb;
+    }
+
+    .form-input:focus, .form-select:focus {
+      outline: none;
+      border-color: #2563eb;
+      background: white;
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    }
+
+    .form-select {
+      cursor: pointer;
+      appearance: none;
+      background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>');
+      background-repeat: no-repeat;
+      background-position: right 15px center;
+      background-size: 20px;
+      padding-right: 45px;
+    }
+
+    .auth-button {
+      width: 100%;
+      padding: 16px;
+      background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .auth-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px rgba(37, 99, 235, 0.3);
+    }
+
+    .auth-button:active {
+      transform: translateY(0);
+    }
+
+    .auth-button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .form-toggle {
+      text-align: center;
+      margin-top: 25px;
+      padding-top: 25px;
+      border-top: 1px solid #e5e7eb;
+    }
+
+    .toggle-text {
+      color: #6b7280;
+      font-size: 14px;
+    }
+
+    .toggle-link {
+      color: #2563eb;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      margin-left: 5px;
+      transition: color 0.3s ease;
+    }
+
+    .toggle-link:hover {
+      color: #1d4ed8;
+    }
+
+    .error-message {
+      background: #fef2f2;
+      border: 1px solid #fecaca;
+      color: #dc2626;
+      padding: 12px 16px;
+      border-radius: 8px;
+      font-size: 14px;
+      margin-bottom: 20px;
+      display: none;
+    }
+
+    .success-message {
+      background: #f0fdf4;
+      border: 1px solid #bbf7d0;
+      color: #16a34a;
+      padding: 12px 16px;
+      border-radius: 8px;
+      font-size: 14px;
+      margin-bottom: 20px;
+      display: none;
+    }
+
+    .loading-spinner {
+      display: none;
+      width: 20px;
+      height: 20px;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      border-top-color: white;
+      animation: spin 1s ease-in-out infinite;
+      margin-right: 10px;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .role-description {
+      font-size: 12px;
+      color: #6b7280;
+      margin-top: 5px;
+      font-style: italic;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+    }
+
+    @media (max-width: 480px) {
+      .auth-container {
+        margin: 10px;
+        border-radius: 15px;
+      }
+      
+      .auth-content {
+        padding: 30px 20px;
+      }
+      
+      .form-row {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .hidden {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="auth-container">
+    <div class="auth-header">
+      <div class="logo">
+        <div class="logo-icon">🛡️</div>
+        <h1 class="auth-title">HackHive</h1>
+        <p class="auth-subtitle">Disaster Management Education Platform</p>
+      </div>
+    </div>
+
+    <div class="auth-content">
+      <!-- Login Form -->
+      <form id="loginForm" class="auth-form">
+        <div class="error-message" id="loginError"></div>
+        <div class="success-message" id="loginSuccess"></div>
+
+        <div class="form-group">
+          <label class="form-label" for="loginRole">Select Your Role</label>
+          <select class="form-select" id="loginRole" required>
+            <option value="">Choose your role</option>
+            <option value="student">Student</option>
+            <option value="parent">Parent/Guardian</option>
+            <option value="teacher">Teacher</option>
+            <option value="college">College/University Staff</option>
+            <option value="admin">Administrative Staff</option>
+          </select>
+          <div class="role-description" id="loginRoleDesc"></div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="loginEmail">Email Address</label>
+          <input type="email" class="form-input" id="loginEmail" placeholder="Enter your email address" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="loginPassword">Password</label>
+          <input type="password" class="form-input" id="loginPassword" placeholder="Enter your password" required>
+        </div>
+
+        <button type="submit" class="auth-button" id="loginButton">
+          <span class="loading-spinner" id="loginSpinner"></span>
+          <span id="loginButtonText">Sign In</span>
+        </button>
+
+        <div class="form-toggle">
+          <span class="toggle-text">Don't have an account?</span>
+          <a href="#" class="toggle-link" id="showSignup">Create Account</a>
+        </div>
+      </form>
+
+      <!-- Signup Form -->
+      <form id="signupForm" class="auth-form hidden">
+        <div class="error-message" id="signupError"></div>
+        <div class="success-message" id="signupSuccess"></div>
+
+        <div class="form-group">
+          <label class="form-label" for="signupRole">Select Your Role</label>
+          <select class="form-select" id="signupRole" required>
+            <option value="">Choose your role</option>
+            <option value="student">Student</option>
+            <option value="parent">Parent/Guardian</option>
+            <option value="teacher">Teacher</option>
+            <option value="college">College/University Staff</option>
+            <option value="admin">Administrative Staff</option>
+          </select>
+          <div class="role-description" id="signupRoleDesc"></div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="signupFirstName">First Name</label>
+            <input type="text" class="form-input" id="signupFirstName" placeholder="First name" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="signupLastName">Last Name</label>
+            <input type="text" class="form-input" id="signupLastName" placeholder="Last name" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="signupEmail">Email Address</label>
+          <input type="email" class="form-input" id="signupEmail" placeholder="Enter your email address" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="signupPassword">Password</label>
+          <input type="password" class="form-input" id="signupPassword" placeholder="Create a strong password" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="signupConfirmPassword">Confirm Password</label>
+          <input type="password" class="form-input" id="signupConfirmPassword" placeholder="Confirm your password" required>
+        </div>
+
+        <div class="form-group" id="institutionGroup" style="display: none;">
+          <label class="form-label" for="signupInstitution">Institution Name</label>
+          <input type="text" class="form-input" id="signupInstitution" placeholder="Enter your institution name">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="signupRegion">Region</label>
+          <select class="form-select" id="signupRegion" required>
+            <option value="">Select your region</option>
+            <option value="north">North India</option>
+            <option value="south">South India</option>
+            <option value="east">East India</option>
+            <option value="west">West India</option>
+            <option value="central">Central India</option>
+            <option value="northeast">Northeast India</option>
+          </select>
+        </div>
+
+        <button type="submit" class="auth-button" id="signupButton">
+          <span class="loading-spinner" id="signupSpinner"></span>
+          <span id="signupButtonText">Create Account</span>
+        </button>
+
+        <div class="form-toggle">
+          <span class="toggle-text">Already have an account?</span>
+          <a href="#" class="toggle-link" id="showLogin">Sign In</a>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    // Role descriptions
+    const roleDescriptions = {
+      student: "Access learning modules, virtual drills, and track your progress",
+      parent: "Monitor your child's progress and receive safety updates",
+      teacher: "Manage classroom activities and student assessments",
+      college: "Oversee university-level disaster preparedness programs",
+      admin: "Full administrative access to manage the platform"
+    };
+
+    // DOM elements
+    const loginForm = document.getElementById('loginForm');
+    const signupForm = document.getElementById('signupForm');
+    const showSignupLink = document.getElementById('showSignup');
+    const showLoginLink = document.getElementById('showLogin');
+
+    // Form toggle functionality
+    showSignupLink.addEventListener('click', (e) => {
+      e.preventDefault();
+      loginForm.classList.add('hidden');
+      signupForm.classList.remove('hidden');
+    });
+
+    showLoginLink.addEventListener('click', (e) => {
+      e.preventDefault();
+      signupForm.classList.add('hidden');
+      loginForm.classList.remove('hidden');
+    });
+
+    // Role description updates
+    document.getElementById('loginRole').addEventListener('change', (e) => {
+      const desc = document.getElementById('loginRoleDesc');
+      desc.textContent = roleDescriptions[e.target.value] || '';
+    });
+
+    document.getElementById('signupRole').addEventListener('change', (e) => {
+      const desc = document.getElementById('signupRoleDesc');
+      const institutionGroup = document.getElementById('institutionGroup');
+      
+      desc.textContent = roleDescriptions[e.target.value] || '';
+      
+      // Show institution field for teachers, college staff, and admins
+      if (['teacher', 'college', 'admin'].includes(e.target.value)) {
+        institutionGroup.style.display = 'block';
+        document.getElementById('signupInstitution').required = true;
+      } else {
+        institutionGroup.style.display = 'none';
+        document.getElementById('signupInstitution').required = false;
+      }
+    });
+
+    // API Base URL
+    const API_BASE = 'http://localhost:3000/api';
+
+    // Utility functions
+    function showError(formType, message) {
+      const errorEl = document.getElementById(`${formType}Error`);
+      errorEl.textContent = message;
+      errorEl.style.display = 'block';
+      setTimeout(() => {
+        errorEl.style.display = 'none';
+      }, 5000);
+    }
+
+    function showSuccess(formType, message) {
+      const successEl = document.getElementById(`${formType}Success`);
+      successEl.textContent = message;
+      successEl.style.display = 'block';
+      setTimeout(() => {
+        successEl.style.display = 'none';
+      }, 3000);
+    }
+
+    function setLoading(formType, loading) {
+      const button = document.getElementById(`${formType}Button`);
+      const spinner = document.getElementById(`${formType}Spinner`);
+      const text = document.getElementById(`${formType}ButtonText`);
+      
+      if (loading) {
+        button.disabled = true;
+        spinner.style.display = 'inline-block';
+        text.textContent = formType === 'login' ? 'Signing In...' : 'Creating Account...';
+      } else {
+        button.disabled = false;
+        spinner.style.display = 'none';
+        text.textContent = formType === 'login' ? 'Sign In' : 'Create Account';
+      }
+    }
+
+    // Login form submission
+    loginForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      setLoading('login', true);
+
+      const formData = {
+        email: document.getElementById('loginEmail').value,
+        password: document.getElementById('loginPassword').value,
+        role: document.getElementById('loginRole').value
+      };
+
+      try {
+        const response = await fetch(`${API_BASE}/auth/login`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(formData)
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          localStorage.setItem('hackhive_token', data.token);
+          localStorage.setItem('hackhive_user', JSON.stringify(data.user));
+          showSuccess('login', 'Login successful! Redirecting...');
+          
+          setTimeout(() => {
+            window.location.href = 'index.html';
+          }, 1500);
+        } else {
+          showError('login', data.message || 'Login failed. Please try again.');
+        }
+      } catch (error) {
+        console.error('Login error:', error);
+        showError('login', 'Network error. Please check your connection and try again.');
+      } finally {
+        setLoading('login', false);
+      }
+    });
+
+    // Signup form submission
+    signupForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      setLoading('signup', true);
+
+      const password = document.getElementById('signupPassword').value;
+      const confirmPassword = document.getElementById('signupConfirmPassword').value;
+
+      if (password !== confirmPassword) {
+        showError('signup', 'Passwords do not match.');
+        setLoading('signup', false);
+        return;
+      }
+
+      if (password.length < 6) {
+        showError('signup', 'Password must be at least 6 characters long.');
+        setLoading('signup', false);
+        return;
+      }
+
+      const formData = {
+        firstName: document.getElementById('signupFirstName').value,
+        lastName: document.getElementById('signupLastName').value,
+        email: document.getElementById('signupEmail').value,
+        password: password,
+        role: document.getElementById('signupRole').value,
+        region: document.getElementById('signupRegion').value,
+        institution: document.getElementById('signupInstitution').value || null
+      };
+
+      try {
+        const response = await fetch(`${API_BASE}/auth/register`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(formData)
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          showSuccess('signup', 'Account created successfully! Please sign in.');
+          setTimeout(() => {
+            signupForm.classList.add('hidden');
+            loginForm.classList.remove('hidden');
+            signupForm.reset();
+          }, 2000);
+        } else {
+          showError('signup', data.message || 'Registration failed. Please try again.');
+        }
+      } catch (error) {
+        console.error('Signup error:', error);
+        showError('signup', 'Network error. Please check your connection and try again.');
+      } finally {
+        setLoading('signup', false);
+      }
+    });
+
+    // Check if user is already logged in
+    if (localStorage.getItem('hackhive_token')) {
+      window.location.href = 'index.html';
+    }
+  </script>
+</body>
+</html>
