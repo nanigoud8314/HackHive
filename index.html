@@ -6,12 +6,261 @@
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>SafeLearn - Disaster Management Education Platform</title>
+    <style>
+      /* Landing page styles */
+      .landing-page {
+        min-height: 100vh;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        text-align: center;
+        padding: 20px;
+      }
+      
+      .landing-header {
+        margin-bottom: 3rem;
+      }
+      
+      .landing-logo {
+        font-size: 4rem;
+        margin-bottom: 1rem;
+      }
+      
+      .landing-title {
+        font-size: 3.5rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+      }
+      
+      .landing-subtitle {
+        font-size: 1.5rem;
+        margin-bottom: 2rem;
+        opacity: 0.9;
+        max-width: 800px;
+      }
+      
+      .landing-features {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 2rem;
+        margin: 3rem 0;
+        max-width: 1000px;
+      }
+      
+      .feature-card {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        border-radius: 15px;
+        padding: 2rem;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        transition: transform 0.3s ease;
+      }
+      
+      .feature-card:hover {
+        transform: translateY(-5px);
+      }
+      
+      .feature-icon {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+      }
+      
+      .feature-title {
+        font-size: 1.3rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+      }
+      
+      .feature-description {
+        opacity: 0.9;
+        line-height: 1.6;
+      }
+      
+      .landing-cta {
+        margin-top: 3rem;
+      }
+      
+      .cta-button {
+        background: rgba(255, 255, 255, 0.2);
+        color: white;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        padding: 15px 40px;
+        font-size: 1.2rem;
+        font-weight: 600;
+        border-radius: 50px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-block;
+        margin: 0 10px;
+      }
+      
+      .cta-button:hover {
+        background: rgba(255, 255, 255, 0.3);
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+      }
+      
+      .cta-button.primary {
+        background: #2563eb;
+        border-color: #2563eb;
+      }
+      
+      .cta-button.primary:hover {
+        background: #1d4ed8;
+        border-color: #1d4ed8;
+      }
+      
+      .stats-section {
+        display: flex;
+        justify-content: center;
+        gap: 3rem;
+        margin: 3rem 0;
+        flex-wrap: wrap;
+      }
+      
+      .stat-item {
+        text-align: center;
+      }
+      
+      .stat-number {
+        font-size: 2.5rem;
+        font-weight: 700;
+        display: block;
+      }
+      
+      .stat-label {
+        opacity: 0.8;
+        margin-top: 0.5rem;
+      }
+      
+      @media (max-width: 768px) {
+        .landing-title {
+          font-size: 2.5rem;
+        }
+        
+        .landing-subtitle {
+          font-size: 1.2rem;
+        }
+        
+        .landing-features {
+          grid-template-columns: 1fr;
+        }
+        
+        .stats-section {
+          gap: 2rem;
+        }
+        
+        .cta-button {
+          display: block;
+          margin: 10px 0;
+        }
+      }
+      
+      .hidden {
+        display: none !important;
+      }
+    </style>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   </head>
   <body>
-    <div id="app"></div>
+    <!-- Landing Page -->
+    <div id="landingPage" class="landing-page">
+      <div class="landing-header">
+        <div class="landing-logo">🛡️</div>
+        <h1 class="landing-title">HackHive</h1>
+        <p class="landing-subtitle">
+          Empowering India's students with life-saving disaster management education through interactive learning and virtual emergency drills
+        </p>
+      </div>
+      
+      <div class="landing-features">
+        <div class="feature-card">
+          <div class="feature-icon">🎓</div>
+          <h3 class="feature-title">Interactive Learning</h3>
+          <p class="feature-description">
+            Comprehensive disaster management modules tailored for Indian schools and colleges
+          </p>
+        </div>
+        
+        <div class="feature-card">
+          <div class="feature-icon">🎯</div>
+          <h3 class="feature-title">Virtual Drills</h3>
+          <p class="feature-description">
+            Practice emergency scenarios safely through immersive virtual drill simulations
+          </p>
+        </div>
+        
+        <div class="feature-card">
+          <div class="feature-icon">🗺️</div>
+          <h3 class="feature-title">Regional Awareness</h3>
+          <p class="feature-description">
+            Location-specific disaster preparedness based on your region's unique risks
+          </p>
+        </div>
+        
+        <div class="feature-card">
+          <div class="feature-icon">🏆</div>
+          <h3 class="feature-title">Gamified Experience</h3>
+          <p class="feature-description">
+            Earn points, badges, and certificates while learning life-saving skills
+          </p>
+        </div>
+      </div>
+      
+      <div class="stats-section">
+        <div class="stat-item">
+          <span class="stat-number">10,000+</span>
+          <span class="stat-label">Students Trained</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-number">500+</span>
+          <span class="stat-label">Schools Connected</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-number">28</span>
+          <span class="stat-label">States Covered</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-number">95%</span>
+          <span class="stat-label">Preparedness Score</span>
+        </div>
+      </div>
+      
+      <div class="landing-cta">
+        <a href="#" class="cta-button primary" onclick="showLogin()">Get Started</a>
+        <a href="#" class="cta-button" onclick="showDemo()">Watch Demo</a>
+      </div>
+    </div>
+    
+    <!-- Main App (Hidden initially) -->
+    <div id="app" class="hidden"></div>
+    
+    <script>
+      function showLogin() {
+        window.location.href = 'login.html';
+      }
+      
+      function showDemo() {
+        alert('Demo video would be shown here. For now, please click "Get Started" to access the platform.');
+      }
+      
+      function showMainApp() {
+        document.getElementById('landingPage').classList.add('hidden');
+        document.getElementById('app').classList.remove('hidden');
+      }
+      
+      // Check if user is already logged in
+      if (localStorage.getItem('hackhive_token')) {
+        showMainApp();
+      }
+    </script>
     <script type="module" src="./main.js"></script>
   </body>
 </html>
