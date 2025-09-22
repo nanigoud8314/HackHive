@@ -155,8 +155,12 @@ class SafeLearnApp {
 
     // Navigation
     document.addEventListener('click', (e) => {
-      if (e.target.matches('[data-module]')) {
-        this.switchModule(e.target.dataset.module);
+      // Check if clicked element or its parent has data-module attribute
+      const moduleButton = e.target.closest('[data-module]');
+      if (moduleButton) {
+        e.preventDefault();
+        e.stopPropagation();
+        this.switchModule(moduleButton.dataset.module);
       }
     });
     
@@ -282,6 +286,9 @@ class SafeLearnApp {
     } else {
       contentContainer.innerHTML = '<div class="error-message">Module not found</div>';
     }
+    
+    // Update navigation manager
+    this.navigationManager.navigateTo(moduleName);
   }
 
   handleUserTypeChange(userType) {
