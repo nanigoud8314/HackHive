@@ -216,8 +216,18 @@ class SafeLearnApp {
       loginBtn.style.display = 'block';
       logoutBtn.style.display = 'none';
       userProfile.style.display = 'none';
-      // Redirect to login if trying to access protected content
-      window.location.href = 'login.html';
+      // Show landing page instead of redirecting
+      this.showLandingPage();
+    }
+  }
+
+  showLandingPage() {
+    const landingPage = document.getElementById('landingPage');
+    const app = document.getElementById('app');
+    
+    if (landingPage && app) {
+      landingPage.classList.remove('hidden');
+      app.classList.add('hidden');
     }
   }
 
@@ -245,13 +255,15 @@ class SafeLearnApp {
     localStorage.removeItem('hackhive_token');
     localStorage.removeItem('hackhive_user');
     localStorage.removeItem('safelearn_user');
-    window.location.href = 'login.html';
+    // Show landing page instead of redirecting
+    this.showLandingPage();
+    this.checkAuthentication();
   }
 
   switchModule(moduleName) {
     // Check authentication before switching modules
     if (!localStorage.getItem('hackhive_token')) {
-      window.location.href = 'login.html';
+      this.showLandingPage();
       return;
     }
 
@@ -308,14 +320,18 @@ loadInitialView() {
   // Check authentication first
   if (!localStorage.getItem('hackhive_token')) {
     // Show landing page instead of redirecting immediately
-    document.getElementById('landingPage').classList.remove('hidden');
-    document.getElementById('app').classList.add('hidden');
+    this.showLandingPage();
     return;
   }
   
   // Hide landing page and show main app
-  document.getElementById('landingPage').classList.add('hidden');
-  document.getElementById('app').classList.remove('hidden');
+  const landingPage = document.getElementById('landingPage');
+  const app = document.getElementById('app');
+  
+  if (landingPage && app) {
+    landingPage.classList.add('hidden');
+    app.classList.remove('hidden');
+  }
 
   // Load user settings from both storage formats
   let savedUser = localStorage.getItem('hackhive_user');
