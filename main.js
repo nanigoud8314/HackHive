@@ -32,9 +32,9 @@ class SafeLearnApp {
          <div class="header-content">
             <div class="logo">
               <div class="logo-icon">
-                <img src="logon.svg" alt="Logo">
+                <img class="manalogo" src="logo.svg" alt="Logo">
               </div>
-              <h1>Hackhive</h1>
+              <h1>Hackhive  </h1>
             </div>
             <nav class="main-nav" id="mainNav">
               <button class="nav-btn" data-module="dashboard">
