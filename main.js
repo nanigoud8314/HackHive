@@ -235,16 +235,50 @@ class SafeLearnApp {
       document.getElementById('userRole').textContent = user.role.charAt(0).toUpperCase() + user.role.slice(1);
       document.getElementById('userPoints').textContent = `${user.points || 0} pts`;
       
-      // Show admin panel for admins and teachers
-      if (user.role === 'admin' || user.role === 'teacher') {
-        document.querySelector('[data-module="admin"]').style.display = 'block';
-      }
+      // Configure navigation based on user role
+      this.configureNavigationForRole(user.role);
       
       // Update user type select in settings
       const userTypeSelect = document.getElementById('userTypeSelect');
       const regionSelect = document.getElementById('regionSelect');
       if (userTypeSelect) userTypeSelect.value = user.role;
       if (regionSelect) regionSelect.value = user.region;
+    }
+  }
+
+  configureNavigationForRole(role) {
+    const dashboardBtn = document.querySelector('[data-module="dashboard"]');
+    const learningBtn = document.querySelector('[data-module="learning"]');
+    const drillsBtn = document.querySelector('[data-module="drills"]');
+    const emergencyBtn = document.querySelector('[data-module="emergency"]');
+    const adminBtn = document.querySelector('[data-module="admin"]');
+
+    // Reset all buttons to hidden first
+    [dashboardBtn, learningBtn, drillsBtn, emergencyBtn, adminBtn].forEach(btn => {
+      if (btn) btn.style.display = 'none';
+    });
+
+    switch (role) {
+      case 'teacher':
+        // Teachers only see Emergency and Admin
+        if (emergencyBtn) emergencyBtn.style.display = 'block';
+        if (adminBtn) adminBtn.style.display = 'block';
+        break;
+      
+      case 'admin':
+        // Admins see all modules
+        [dashboardBtn, learningBtn, drillsBtn, emergencyBtn, adminBtn].forEach(btn => {
+          if (btn) btn.style.display = 'block';
+        });
+        break;
+      
+      default:
+        // Students and other roles see dashboard, learning, drills, and emergency
+        if (dashboardBtn) dashboardBtn.style.display = 'block';
+        if (learningBtn) learningBtn.style.display = 'block';
+        if (drillsBtn) drillsBtn.style.display = 'block';
+        if (emergencyBtn) emergencyBtn.style.display = 'block';
+        break;
     }
   }
 
@@ -285,12 +319,8 @@ class SafeLearnApp {
   }
 
   handleUserTypeChange(userType) {
-    const adminBtn = document.querySelector('[data-module="admin"]');
-    if (userType === 'admin' || userType === 'teacher') {
-      adminBtn.style.display = 'block';
-    } else {
-      adminBtn.style.display = 'none';
-    }
+    // Configure navigation based on new user type
+    this.configureNavigationForRole(userType);
 
     document.getElementById('userRole').textContent = userType.charAt(0).toUpperCase() + userType.slice(1);
   }
@@ -349,11 +379,18 @@ loadInitialView() {
     if (regionSelect) regionSelect.value = userData.region;
     if (classSelect) classSelect.value = userData.class || userData.profile?.grade || 'secondary';
     
-    this.handleUserTypeChange(userData.type || userData.role);
+    this.configureNavigationForRole(userData.type || userData.role);
   }
 
-  // Load dashboard
-  this.switchModule('dashboard');
+  // Load appropriate initial module based on user role
+  const user = JSON.parse(localStorage.getItem('hackhive_user') || '{}');
+  const userRole = user.role || 'student';
+  
+  if (userRole === 'teacher') {
+    this.switchModule('admin'); // Teachers start with admin panel
+  } else {
+    this.switchModule('dashboard'); // Others start with dashboard
+  }
 
   // Simulate emergency alert (for demo) - only if user is authenticated
   setTimeout(() => {
