@@ -307,7 +307,7 @@ class SafeLearnApp {
         if (drillsBtn) drillsBtn.style.display = 'none';
         if (emergencyBtn) emergencyBtn.style.display = 'block';
         if (adminBtn) adminBtn.style.display = 'block';
-        if (settingsBtn) settingsBtn.style.display = 'block';
+        if (settingsBtn) settingsBtn.style.display = 'none';
         break;
       
       case 'admin':
