@@ -144,16 +144,20 @@ body {
   background: rgba(255, 255, 255, 0.2);
   padding: var(--space-2);
   border-radius: var(--border-radius-lg);
+ 
+}
+.logo-img {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  padding: 4px;
+  object-fit: cover;
 }
 
 .logo h1 {
   font-size: var(--font-size-2xl);
   font-weight: 700;
   margin: 0;
-}
-.manalogo{
-  width: 50px ;
-  height: 50px;
 }
 
 .main-nav {
@@ -164,10 +168,6 @@ body {
   padding: 10px 20px;
   background-color: #2563eb;
   box-sizing: border-box;
-}
-.manalogo{
-  height: 50px;
-  width: 50px;
 }
 
 .nav-btn {
