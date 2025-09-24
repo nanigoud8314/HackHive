@@ -271,6 +271,12 @@ class SafeLearnApp {
       const regionSelect = document.getElementById('regionSelect');
       if (userTypeSelect) userTypeSelect.value = user.role;
       if (regionSelect) regionSelect.value = user.region;
+    } else {
+      // Fallback for users without proper data
+      document.getElementById('userName').textContent = 'User';
+      document.getElementById('userRole').textContent = 'Student';
+      document.getElementById('userPoints').textContent = '0 pts';
+      this.configureNavigationForRole('student');
     }
   }
 
@@ -281,16 +287,20 @@ class SafeLearnApp {
     const emergencyBtn = document.querySelector('[data-module="emergency"]');
     const adminBtn = document.querySelector('[data-module="admin"]');
 
-    // Reset all buttons to hidden first
-    [dashboardBtn, learningBtn, drillsBtn, emergencyBtn, adminBtn].forEach(btn => {
-      if (btn) btn.style.display = 'none';
+    // Reset all buttons to visible first
+    [dashboardBtn, learningBtn, drillsBtn, emergencyBtn].forEach(btn => {
+      if (btn) btn.style.display = 'block';
     });
+    
+    // Hide admin by default
+    if (adminBtn) adminBtn.style.display = 'none';
 
     switch (role) {
       case 'teacher':
-        // Teachers only see Emergency and Admin
-        if (emergencyBtn) emergencyBtn.style.display = 'block';
-        if (adminBtn) adminBtn.style.display = 'block';
+        // Teachers see all modules plus admin
+        [dashboardBtn, learningBtn, drillsBtn, emergencyBtn, adminBtn].forEach(btn => {
+          if (btn) btn.style.display = 'block';
+        });
         break;
       
       case 'admin':
@@ -300,12 +310,15 @@ class SafeLearnApp {
         });
         break;
       
+      case 'student':
+      case 'parent':
       default:
-        // Students and other roles see dashboard, learning, drills, and emergency
+        // Students, parents and other roles see dashboard, learning, drills, and emergency
         if (dashboardBtn) dashboardBtn.style.display = 'block';
         if (learningBtn) learningBtn.style.display = 'block';
         if (drillsBtn) drillsBtn.style.display = 'block';
         if (emergencyBtn) emergencyBtn.style.display = 'block';
+        if (adminBtn) adminBtn.style.display = 'block';
         break;
     }
   }
@@ -410,15 +423,8 @@ loadInitialView() {
     this.configureNavigationForRole(userData.type || userData.role);
   }
 
-  // Load appropriate initial module based on user role
-  const user = JSON.parse(localStorage.getItem('hackhive_user') || '{}');
-  const userRole = user.role || 'student';
-  
-  if (userRole === 'teacher') {
-    this.switchModule('admin'); // Teachers start with admin panel
-  } else {
-    this.switchModule('dashboard'); // Others start with dashboard
-  }
+  // Always start with dashboard for all users
+  this.switchModule('dashboard');
 
   // Simulate emergency alert (for demo) - only if user is authenticated
   setTimeout(() => {

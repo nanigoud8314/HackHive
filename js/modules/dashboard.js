@@ -418,7 +418,11 @@ export class DashboardModule {
     // Check if user is logged in
     const token = localStorage.getItem('hackhive_token');
     if (!token) {
-      window.location.href = 'login.html';
+      // Don't redirect, just show login message
+      const content = document.getElementById('progressContent');
+      if (content) {
+        content.innerHTML = '<p>Please log in to view your progress.</p>';
+      }
       return;
     }
 
@@ -437,9 +441,23 @@ export class DashboardModule {
       user = JSON.parse(localStorage.getItem('safelearn_user') || '{}');
     }
     
+    // If still no user data, create default
+    if (!user.id && !user.name) {
+      user = {
+        id: 'demo_user',
+        name: 'Demo User',
+        points: 0,
+        badges: [],
+        completedModules: [],
+        drillsCompleted: 0,
+        region: 'west'
+      };
+    }
+    
     const gamification = window.gamification || { generateProgressData: () => ({ currentLevel: { level: 0, title: 'New Learner' }, progress: 0, pointsToNext: 100, totalPoints: 0 }) };
     
-    const progressData = gamification.generateProgressData(user.points || 0);
+    const userPoints = user.points || 0;
+    const progressData = gamification.generateProgressData(userPoints);
     const progressContent = document.getElementById('progressContent');
     
     if (progressContent) {
@@ -473,6 +491,17 @@ export class DashboardModule {
             <div class="stat-label">Badges Earned</div>
           </div>
         </div>
+        
+        ${userPoints === 0 ? `
+          <div style="margin-top: var(--space-6); padding: var(--space-4); background: var(--info-color); background: rgba(59, 130, 246, 0.1); border-radius: var(--border-radius-lg); text-align: center;">
+            <h4 style="color: var(--info-color); margin-bottom: var(--space-2);">🚀 Welcome to HackHive!</h4>
+            <p style="color: var(--neutral-600); margin-bottom: var(--space-4);">Start your disaster preparedness journey by exploring our learning modules and virtual drills.</p>
+            <div style="display: flex; gap: var(--space-3); justify-content: center; flex-wrap: wrap;">
+              <button class="btn-primary" data-action="learn-disaster" style="padding: var(--space-2) var(--space-4); background: var(--info-color); border: none; border-radius: var(--border-radius); color: white; cursor: pointer;">Start Learning</button>
+              <button class="btn-primary" data-action="start-drill" style="padding: var(--space-2) var(--space-4); background: var(--accent-color); border: none; border-radius: var(--border-radius); color: white; cursor: pointer;">Try a Drill</button>
+            </div>
+          </div>
+        ` : ''}
       `;
 
       // Add stats grid styles
