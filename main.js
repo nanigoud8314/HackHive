@@ -65,6 +65,7 @@ class SafeLearnApp {
                 </div>
                 <div class="user-points" id="userPoints">0 pts</div>
               </div>
+              <button class="settings-btn" id="settingsBtn" title="Settings">⚙️</button>
             </div>
           </div>
         </header>
