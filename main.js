@@ -15,10 +15,8 @@ class SafeLearnApp {
     this.userManager = new UserManager();
     this.gamification = new GameificationManager();
     this.modules = {};
-
     this.init();
   }
-
   init() {
     this.setupApp();
     this.setupEventListeners();
@@ -31,9 +29,7 @@ class SafeLearnApp {
         <header class="app-header">
          <div class="header-content">
             <div class="logo">
-              <div class="logo-icon">
-                <img src="logon.svg" alt="Logo">
-              </div>
+       
               <h1>Hackhive</h1>
             </div>
             <nav class="main-nav" id="mainNav">
@@ -73,13 +69,11 @@ class SafeLearnApp {
             </div>
           </div>
         </header>
-
         <main class="app-main">
           <div class="content-container" id="contentContainer">
             <!-- Dynamic content will be loaded here -->
           </div>
         </main>
-
         <!-- Emergency Alert Overlay -->
         <div class="emergency-overlay hidden" id="emergencyOverlay">
           <div class="emergency-alert">
@@ -93,7 +87,6 @@ class SafeLearnApp {
             </div>
           </div>
         </div>
-
         <!-- Settings Modal -->
         <div class="modal-overlay hidden" id="settingsModal">
           <div class="modal">
@@ -155,8 +148,12 @@ class SafeLearnApp {
 
     // Navigation
     document.addEventListener('click', (e) => {
-      if (e.target.matches('[data-module]')) {
-        this.switchModule(e.target.dataset.module);
+      // Check if clicked element or its parent has data-module attribute
+      const moduleButton = e.target.closest('[data-module]');
+      if (moduleButton) {
+        e.preventDefault();
+        e.stopPropagation();
+        this.switchModule(moduleButton.dataset.module);
       }
     });
     
@@ -216,8 +213,18 @@ class SafeLearnApp {
       loginBtn.style.display = 'block';
       logoutBtn.style.display = 'none';
       userProfile.style.display = 'none';
-      // Redirect to login if trying to access protected content
-      window.location.href = 'login.html';
+      // Show landing page instead of redirecting
+      this.showLandingPage();
+    }
+  }
+
+  showLandingPage() {
+    const landingPage = document.getElementById('landingPage');
+    const app = document.getElementById('app');
+    
+    if (landingPage && app) {
+      landingPage.classList.remove('hidden');
+      app.classList.add('hidden');
     }
   }
 
@@ -245,13 +252,15 @@ class SafeLearnApp {
     localStorage.removeItem('hackhive_token');
     localStorage.removeItem('hackhive_user');
     localStorage.removeItem('safelearn_user');
-    window.location.href = 'login.html';
+    // Show landing page instead of redirecting
+    this.showLandingPage();
+    this.checkAuthentication();
   }
 
   switchModule(moduleName) {
     // Check authentication before switching modules
     if (!localStorage.getItem('hackhive_token')) {
-      window.location.href = 'login.html';
+      this.showLandingPage();
       return;
     }
 
@@ -270,6 +279,9 @@ class SafeLearnApp {
     } else {
       contentContainer.innerHTML = '<div class="error-message">Module not found</div>';
     }
+    
+    // Update navigation manager
+    this.navigationManager.navigateTo(moduleName);
   }
 
   handleUserTypeChange(userType) {
@@ -307,8 +319,18 @@ class SafeLearnApp {
 loadInitialView() {
   // Check authentication first
   if (!localStorage.getItem('hackhive_token')) {
-    window.location.href = 'login.html';
+    // Show landing page instead of redirecting immediately
+    this.showLandingPage();
     return;
+  }
+  
+  // Hide landing page and show main app
+  const landingPage = document.getElementById('landingPage');
+  const app = document.getElementById('app');
+  
+  if (landingPage && app) {
+    landingPage.classList.add('hidden');
+    app.classList.remove('hidden');
   }
 
   // Load user settings from both storage formats

@@ -400,6 +400,60 @@
       admin: "Full administrative access to manage the platform"
     };
 
+    // Pre-defined test accounts for easy login
+    const testAccounts = {
+      'admin@hackhive.com': {
+        password: 'admin123',
+        role: 'admin',
+        firstName: 'Admin',
+        lastName: 'User',
+        region: 'west',
+        institution: 'HackHive Platform',
+        points: 1000,
+        badges: ['safety-ambassador', 'emergency-ready']
+      },
+      'teacher@hackhive.com': {
+        password: 'teacher123',
+        role: 'teacher',
+        firstName: 'Dr. Sunita',
+        lastName: 'Kumar',
+        region: 'west',
+        institution: 'Mumbai International School',
+        points: 750,
+        badges: ['safety-ambassador']
+      },
+      'priya@student.com': {
+        password: 'student123',
+        role: 'student',
+        firstName: 'Priya',
+        lastName: 'Sharma',
+        region: 'north',
+        institution: 'Delhi Public School',
+        points: 450,
+        badges: ['first-drill', 'earthquake-expert']
+      },
+      'rahul@student.com': {
+        password: 'student123',
+        role: 'student',
+        firstName: 'Rahul',
+        lastName: 'Verma',
+        region: 'west',
+        institution: 'Mumbai International School',
+        points: 380,
+        badges: ['first-drill', 'flood-specialist']
+      },
+      'anita@student.com': {
+        password: 'student123',
+        role: 'student',
+        firstName: 'Anita',
+        lastName: 'Patel',
+        region: 'west',
+        institution: 'Gujarat Science College',
+        points: 520,
+        badges: ['first-drill', 'drill-master', 'fire-safety-pro']
+      }
+    };
+
     // DOM elements
     const loginForm = document.getElementById('loginForm');
     const signupForm = document.getElementById('signupForm');
@@ -451,9 +505,6 @@
       }
     });
 
-    // API Base URL - Updated to use localhost for development
-    const API_BASE = window.location.hostname === 'localhost' ? 'http://localhost:3000/api' : '/api';
-
     // Utility functions
     function showError(formType, message) {
       const errorEl = document.getElementById(`${formType}Error`);
@@ -489,44 +540,57 @@
       }
     }
 
+    // Generate a simple token
+    function generateToken() {
+      return 'token_' + Math.random().toString(36).substr(2, 9) + '_' + Date.now();
+    }
+
     // Login form submission
     loginForm.addEventListener('submit', async (e) => {
       e.preventDefault();
       setLoading('login', true);
 
-      const formData = {
-        email: document.getElementById('loginEmail').value,
-        password: document.getElementById('loginPassword').value,
-        role: document.getElementById('loginRole').value
-      };
+      const email = document.getElementById('loginEmail').value;
+      const password = document.getElementById('loginPassword').value;
+      const role = document.getElementById('loginRole').value;
 
       try {
-        const response = await fetch(`${API_BASE}/auth/login`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(formData)
-        });
+        // Check if it's a test account
+        const testAccount = testAccounts[email];
+        
+        if (testAccount && testAccount.password === password && testAccount.role === role) {
+          // Successful login with test account
+          const token = generateToken();
+          const user = {
+            id: 'user_' + Math.random().toString(36).substr(2, 9),
+            firstName: testAccount.firstName,
+            lastName: testAccount.lastName,
+            email: email,
+            role: testAccount.role,
+            region: testAccount.region,
+            institution: testAccount.institution,
+            points: testAccount.points || 0,
+            badges: testAccount.badges || [],
+            completedModules: [],
+            drillsCompleted: 0,
+            bestDrillScore: 0
+          };
 
-        const data = await response.json();
-
-        if (response.ok) {
-          localStorage.setItem('hackhive_token', data.token);
-          localStorage.setItem('hackhive_user', JSON.stringify(data.user));
+          localStorage.setItem('hackhive_token', token);
+          localStorage.setItem('hackhive_user', JSON.stringify(user));
           
           // Also set the old format for compatibility
           localStorage.setItem('safelearn_user', JSON.stringify({
-            id: data.user.id,
-            name: `${data.user.firstName} ${data.user.lastName}`,
-            type: data.user.role,
-            region: data.user.region,
-            class: data.user.profile?.grade || 'secondary',
-            points: data.user.points || 0,
-            badges: data.user.badges || [],
-            completedModules: data.user.completedModules || [],
-            drillsCompleted: data.user.drillsCompleted || 0,
-            bestDrillScore: data.user.bestDrillScore || 0
+            id: user.id,
+            name: `${user.firstName} ${user.lastName}`,
+            type: user.role,
+            region: user.region,
+            class: 'secondary',
+            points: user.points,
+            badges: user.badges,
+            completedModules: [],
+            drillsCompleted: 0,
+            bestDrillScore: 0
           }));
           
           showSuccess('login', 'Login successful! Redirecting...');
@@ -535,11 +599,11 @@
             window.location.href = 'index.html';
           }, 1500);
         } else {
-          showError('login', data.message || 'Login failed. Please try again.');
+          showError('login', 'Invalid credentials or role. Try using one of the test accounts: admin@hackhive.com, teacher@hackhive.com, or priya@student.com with password: admin123, teacher123, or student123 respectively.');
         }
       } catch (error) {
         console.error('Login error:', error);
-        showError('login', 'Network error. Please check your connection and try again.');
+        showError('login', 'Login failed. Please try again.');
       } finally {
         setLoading('login', false);
       }
@@ -565,43 +629,59 @@
         return;
       }
 
-      const formData = {
-        firstName: document.getElementById('signupFirstName').value,
-        lastName: document.getElementById('signupLastName').value,
-        email: document.getElementById('signupEmail').value,
-        password: password,
-        role: document.getElementById('signupRole').value,
-        region: document.getElementById('signupRegion').value,
-        institution: document.getElementById('signupInstitution').value || null,
-        profile: {
-          grade: document.getElementById('signupGrade').value || null
-        }
-      };
+      const firstName = document.getElementById('signupFirstName').value;
+      const lastName = document.getElementById('signupLastName').value;
+      const email = document.getElementById('signupEmail').value;
+      const role = document.getElementById('signupRole').value;
+      const region = document.getElementById('signupRegion').value;
+      const institution = document.getElementById('signupInstitution').value || null;
+      const grade = document.getElementById('signupGrade').value || null;
 
       try {
-        const response = await fetch(`${API_BASE}/auth/register`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(formData)
-        });
-
-        const data = await response.json();
-
-        if (response.ok) {
-          showSuccess('signup', 'Account created successfully! Please sign in.');
-          setTimeout(() => {
-            signupForm.classList.add('hidden');
-            loginForm.classList.remove('hidden');
-            signupForm.reset();
-          }, 2000);
-        } else {
-          showError('signup', data.message || 'Registration failed. Please try again.');
+        // Check if email already exists in test accounts
+        if (testAccounts[email]) {
+          showError('signup', 'An account with this email already exists. Please use a different email or try logging in.');
+          setLoading('signup', false);
+          return;
         }
+
+        // Create new user account
+        const token = generateToken();
+        const user = {
+          id: 'user_' + Math.random().toString(36).substr(2, 9),
+          firstName: firstName,
+          lastName: lastName,
+          email: email,
+          role: role,
+          region: region,
+          institution: institution,
+          points: 0,
+          badges: [],
+          completedModules: [],
+          drillsCompleted: 0,
+          bestDrillScore: 0,
+          profile: {
+            grade: grade
+          }
+        };
+
+        // Store the new account
+        const existingAccounts = JSON.parse(localStorage.getItem('user_accounts') || '{}');
+        existingAccounts[email] = {
+          password: password,
+          ...user
+        };
+        localStorage.setItem('user_accounts', JSON.stringify(existingAccounts));
+
+        showSuccess('signup', 'Account created successfully! Please sign in.');
+        setTimeout(() => {
+          signupForm.classList.add('hidden');
+          loginForm.classList.remove('hidden');
+          signupForm.reset();
+        }, 2000);
       } catch (error) {
         console.error('Signup error:', error);
-        showError('signup', 'Network error. Please check your connection and try again.');
+        showError('signup', 'Registration failed. Please try again.');
       } finally {
         setLoading('signup', false);
       }
