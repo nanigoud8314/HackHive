@@ -756,11 +756,15 @@ export class AdminModule {
       }
     ];
 
+    // Get current user role to determine if create button should be shown
+    const user = JSON.parse(localStorage.getItem('hackhive_user') || '{}');
+    const userRole = user.role || 'student';
+    const showCreateButton = userRole === 'admin';
     return `
       <div class="alerts-management">
         <div class="table-header">
           <h3>🚨 Emergency Alerts Management</h3>
-          <button class="btn-primary">+ Create New Alert</button>
+          ${showCreateButton ? '<button class="btn-primary">+ Create New Alert</button>' : ''}
         </div>
         
         <div class="alerts-list">
@@ -780,9 +784,11 @@ export class AdminModule {
                 </div>
               </div>
               <div class="alert-actions">
-                <button class="btn-small btn-primary">Edit</button>
-                <button class="btn-small btn-secondary">Send Update</button>
-                <button class="btn-small btn-secondary">Archive</button>
+                ${showCreateButton ? `
+                  <button class="btn-small btn-primary">Edit</button>
+                  <button class="btn-small btn-secondary">Send Update</button>
+                  <button class="btn-small btn-secondary">Archive</button>
+                ` : ''}
               </div>
             </div>
           `).join('')}
