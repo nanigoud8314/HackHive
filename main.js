@@ -29,9 +29,7 @@ class SafeLearnApp {
         <header class="app-header">
          <div class="header-content">
             <div class="logo">
-              <div class="logo-icon">
-                <img class="logo-img" src="logo.svg" alt="Hackhive Logo">
-              </div>
+       
               <h1>Hackhive</h1>
             </div>
             <nav class="main-nav" id="mainNav">
