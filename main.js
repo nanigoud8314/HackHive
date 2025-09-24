@@ -189,6 +189,35 @@ class SafeLearnApp {
     document.getElementById('closeAlert').addEventListener('click', () => {
       document.getElementById('emergencyOverlay').classList.add('hidden');
     });
+    
+    // Close emergency overlay when clicking background
+    document.getElementById('emergencyOverlay').addEventListener('click', (e) => {
+      if (e.target.id === 'emergencyOverlay') {
+        document.getElementById('emergencyOverlay').classList.add('hidden');
+      }
+    });
+    
+    // Handle emergency alert action buttons
+    document.addEventListener('click', (e) => {
+      if (e.target.matches('.alert-btn')) {
+        const buttonText = e.target.textContent.toLowerCase();
+        if (buttonText.includes('dismiss') || buttonText.includes('ok')) {
+          document.getElementById('emergencyOverlay').classList.add('hidden');
+        } else if (buttonText.includes('safety') || buttonText.includes('guidelines')) {
+          // Switch to emergency module
+          this.switchModule('emergency');
+          document.getElementById('emergencyOverlay').classList.add('hidden');
+        }
+      }
+      
+      // Handle modal OK buttons
+      if (e.target.matches('button') && e.target.textContent === 'OK') {
+        const modal = e.target.closest('[id^="modal_"]');
+        if (modal) {
+          modal.remove();
+        }
+      }
+    });
 
     // User type change
     document.getElementById('userTypeSelect').addEventListener('change', (e) => {

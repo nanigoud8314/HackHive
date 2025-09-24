@@ -977,8 +977,9 @@ export class EmergencyModule {
 
   showModal(title, message, type = 'info') {
     const modal = document.createElement('div');
+    const modalId = 'modal_' + Date.now();
     modal.innerHTML = `
-      <div style="
+      <div id="${modalId}" style="
         position: fixed;
         top: 0;
         left: 0;
@@ -1013,7 +1014,7 @@ export class EmergencyModule {
             color: var(--neutral-600);
             line-height: 1.6;
           ">${message}</div>
-          <button onclick="this.closest('[style*=\"position: fixed\"]').remove()" style="
+          <button onclick="document.getElementById('${modalId}').remove()" style="
             background: var(--primary-color);
             color: white;
             border: none;
@@ -1022,18 +1023,28 @@ export class EmergencyModule {
             font-weight: 600;
             cursor: pointer;
             width: 100%;
-          ">OK</button>
+            transition: background-color 0.2s ease;
+          " onmouseover="this.style.background='var(--primary-dark)'" onmouseout="this.style.background='var(--primary-color)'">OK</button>
         </div>
       </div>
     `;
     
     document.body.appendChild(modal);
     
+    // Add click event listener to the modal background to close on outside click
+    const modalElement = document.getElementById(modalId);
+    modalElement.addEventListener('click', (e) => {
+      if (e.target === modalElement) {
+        modalElement.remove();
+      }
+    });
+    
     // Auto-remove after 10 seconds for non-critical messages
     if (type === 'info' || type === 'success') {
       setTimeout(() => {
-        if (modal.parentNode) {
-          document.body.removeChild(modal);
+        const modalElement = document.getElementById(modalId);
+        if (modalElement && modalElement.parentNode) {
+          modalElement.remove();
         }
       }, 10000);
     }
