@@ -4,10 +4,13 @@ const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 require('dotenv').config();
 
-const connectDB = require('./config/database');
+// Import database configurations
+const connectDB = require('./config/database'); // MongoDB (keep for compatibility)
+const { testConnection, initializeDatabase } = require('./config/mysql'); // MySQL
 
 // Import routes
-const authRoutes = require('./routes/auth');
+const authRoutes = require('./routes/auth'); // MongoDB auth
+const mysqlAuthRoutes = require('./routes/mysqlAuth'); // MySQL auth
 const userRoutes = require('./routes/users');
 const moduleRoutes = require('./routes/modules');
 const drillRoutes = require('./routes/drills');
@@ -16,8 +19,30 @@ const adminRoutes = require('./routes/admin');
 
 const app = express();
 
-// Connect to MongoDB
-connectDB();
+// Initialize databases
+const initializeDatabases = async () => {
+  try {
+    // Test MySQL connection
+    const mysqlConnected = await testConnection();
+    if (mysqlConnected) {
+      await initializeDatabase();
+      console.log('✅ MySQL database initialized successfully');
+    }
+    
+    // Keep MongoDB connection for compatibility
+    try {
+      await connectDB();
+      console.log('✅ MongoDB connected (fallback)');
+    } catch (mongoError) {
+      console.log('⚠️  MongoDB connection failed (using MySQL only)');
+    }
+  } catch (error) {
+    console.error('❌ Database initialization failed:', error);
+    process.exit(1);
+  }
+};
+
+initializeDatabases();
 
 // Security middleware
 app.use(helmet());
@@ -57,7 +82,8 @@ app.get('/health', (req, res) => {
 });
 
 // API routes
-app.use('/api/auth', authRoutes);
+app.use('/api/auth', mysqlAuthRoutes); // Use MySQL auth by default
+app.use('/api/auth/mongo', authRoutes); // Keep MongoDB auth as fallback
 app.use('/api/users', userRoutes);
 app.use('/api/modules', moduleRoutes);
 app.use('/api/drills', drillRoutes);
