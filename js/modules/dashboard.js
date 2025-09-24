@@ -759,9 +759,7 @@ export class DashboardModule {
             </div>
           `).join('')}
         </div>
-        <button class="view-full-leaderboard" data-action="view-leaderboard">
-          View Full Leaderboard →
-        </button>
+  
       `;
 
       // Add leaderboard preview styles

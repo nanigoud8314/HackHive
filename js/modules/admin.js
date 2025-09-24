@@ -682,7 +682,7 @@ export class AdminModule {
       <div class="content-management">
         <div class="table-header">
           <h3>📚 Content Management</h3>
-          <button class="btn-primary">+ Add New Content</button>
+         
         </div>
         
         <div class="content-list">
