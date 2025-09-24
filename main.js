@@ -15,10 +15,8 @@ class SafeLearnApp {
     this.userManager = new UserManager();
     this.gamification = new GameificationManager();
     this.modules = {};
-
     this.init();
   }
-
   init() {
     this.setupApp();
     this.setupEventListeners();
@@ -32,9 +30,9 @@ class SafeLearnApp {
          <div class="header-content">
             <div class="logo">
               <div class="logo-icon">
-                <img class="manalogo" src="logo.svg" alt="Logo">
+                <img class="logo-img" src="logo.svg" alt="Hackhive Logo">
               </div>
-              <h1>Hackhive  </h1>
+              <h1>Hackhive</h1>
             </div>
             <nav class="main-nav" id="mainNav">
               <button class="nav-btn" data-module="dashboard">
@@ -73,13 +71,11 @@ class SafeLearnApp {
             </div>
           </div>
         </header>
-
         <main class="app-main">
           <div class="content-container" id="contentContainer">
             <!-- Dynamic content will be loaded here -->
           </div>
         </main>
-
         <!-- Emergency Alert Overlay -->
         <div class="emergency-overlay hidden" id="emergencyOverlay">
           <div class="emergency-alert">
@@ -93,7 +89,6 @@ class SafeLearnApp {
             </div>
           </div>
         </div>
-
         <!-- Settings Modal -->
         <div class="modal-overlay hidden" id="settingsModal">
           <div class="modal">
